@@ -34,20 +34,44 @@ bool CookieCpp::Init(const std::string& name,
     const std::string& path,
     const std::string& secure,
     time_t expires,
-    const std::string& sameSite) {
-    SetName(name);
-    SetValue(value);
+    const std::string& sameSite) 
+{
+	if (!SetName(name)) return false; 
+    if (!SetValue(value)) return false; 
     SetDomain(domain);
     SetPath(path);
     SetSecure(secure);
     SetExpires(expires);
     SetSameSite(sameSite);
+
+    return true;
+}
+
+bool CookieCpp::SetName(const std::string& name) { 
+	if (name.empty()) return false; // Name cannot be empty
+    mName = name; 
+
+	// todo - add validation for cookie name
+    // can contain any US - ASCII characters except for: 
+    // control characters(ASCII characters 0 up to 31 and ASCII character 127) 
+    // or separator characters(space, 
+    // tab and the characters : () < > @, ; : \ " / [ ] ? = { }
+
+	return true;  
+}
+
+bool CookieCpp::SetValue(const std::string& value) { 
+    
+    if (value.empty()) return false; // Value cannot be empty
+    mValue = value;
+    
     return true;
 }
 
 // CookieCpp class implementation
 bool CookieCpp::FromString(const std::string& cookieStr, const std::string& domain) {
     bool isNameSet = false;
+    bool isExpireSet = false;
     auto parameters = SplitString(cookieStr, ';');
 
     if (!domain.empty()) 
@@ -62,6 +86,7 @@ bool CookieCpp::FromString(const std::string& cookieStr, const std::string& doma
 
         if (name.empty()) continue;
 
+		// first we set mandatory Name and Value
         if (!isNameSet) {
             SetName(name);
             SetValue(value);
@@ -69,36 +94,49 @@ bool CookieCpp::FromString(const std::string& cookieStr, const std::string& doma
             continue;
         }
 
-        char initialChar = std::toupper(name[0]);
-        switch (initialChar) 
-        {
-            case 'D':
-                if (StrCaseEq(name, "Domain")) SetDomain(value);
-                break;
-            case 'E':
-                if (StrCaseEq(name, "Expires")) SetExpires(value);
-                break;
-            case 'H':
-                if (StrCaseEq(name, "HttpOnly")) SetHttpOnly(true);
-                break;
-            case 'M':
-                if (StrCaseEq(name, "Max-Age") && std::stoi(value) > 0) 
-                    SetExpires(std::time(nullptr) + std::stoi(value));
-                break;
-            case 'P':
-                if (StrCaseEq(name, "Path")) SetPath(value);
-                break;
-            case 'S':
-                if (StrCaseEq(name, "Secure")) 
-                    SetSecure(true);
-                else if (StrCaseEq(name, "SameSite")) {
-                        SetSameSite(value);
-                    if (StrCaseEq(value, "None")) 
-                        SetSecure(true);
-                }
-                break;
+		// second we check for optional parameters
+        if (StrCaseEq(name, "Domain")) {
+            SetDomain(value);
+        }
+        else if (StrCaseEq(name, "Expires")) {
+            if (!isExpireSet) SetExpires(value);
+        }
+        else if (StrCaseEq(name, "HttpOnly")) {
+            SetHttpOnly(true);
+        }
+        else if (StrCaseEq(name, "Max-Age")) {
+            // Indicates the number of seconds until the cookie expires. 
+            // A zero or negative number will expire the cookie immediately. 
+            // If both Expires and Max-Age are set, Max-Age has precedence.
+            int maxAge = std::stoi(value);
+
+            if (maxAge > 0) {
+                // Max-Age is # seconds from now. So expiration will be <Now> + Value                                                      
+                SetExpires(std::time(nullptr) + maxAge);
+				isExpireSet = true;
+            }
+            else {
+				// todo - expire cookie immediately
+            }
+        }
+        else if (StrCaseEq(name, "Path")) {
+            SetPath(value);
+        }
+        else if (StrCaseEq(name, "Secure")) {
+            SetSecure(true);
+        }
+        else if (StrCaseEq(name, "SameSite")) {
+            SetSameSite(value);
+			// If SameSite is set to "None", the Secure attribute must also be set.
+            if (StrCaseEq(value, "None"))
+                SetSecure(true);
+        }
+        else if (StrCaseEq(name, "Partitioned")) {
+			// todo - Partitioned cookies are not supported in this implementation
+            // Note that if this is set, the Secure attribute must also be set.
         }
     }
+
     return isNameSet;
 }
 

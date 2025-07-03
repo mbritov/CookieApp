@@ -28,8 +28,8 @@ public:
     const std::string& GetExpires() const { return mExpires; }
     const std::string& GetSameSite() const { return mSameSite.size() == 0 ? mSameSite : "(NULL)"; }
 
-    void SetName(const std::string& name) { mName = name; }
-    void SetValue(const std::string& value) { mValue = value; }
+    bool SetName(const std::string& name);
+    bool SetValue(const std::string& value);
     void SetDomain(const std::string& domain);
     void SetPath(const std::string& path);
     void SetExpires(const std::string& expires) { mExpires = expires; }
