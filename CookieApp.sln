@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CookieApp", "CookieApp\Cook
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CookieLib", "CookieLib\CookieLib.vcxproj", "{8B3A90C2-BB68-4C3A-AF36-210F4F9E2192}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CookieTests", "..\Cookies.Tests\Cookies.Tests.vcxproj", "{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{8B3A90C2-BB68-4C3A-AF36-210F4F9E2192}.Release|x64.Build.0 = Release|x64
 		{8B3A90C2-BB68-4C3A-AF36-210F4F9E2192}.Release|x86.ActiveCfg = Release|Win32
 		{8B3A90C2-BB68-4C3A-AF36-210F4F9E2192}.Release|x86.Build.0 = Release|Win32
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Debug|x64.ActiveCfg = Debug|x64
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Debug|x64.Build.0 = Debug|x64
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Debug|x86.ActiveCfg = Debug|Win32
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Debug|x86.Build.0 = Debug|Win32
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Release|x64.ActiveCfg = Release|x64
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Release|x64.Build.0 = Release|x64
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Release|x86.ActiveCfg = Release|Win32
+		{3DBF8BD1-C4EE-4BEB-A4C1-AFE656C48802}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
