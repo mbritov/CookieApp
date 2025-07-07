@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CookieApp.cpp">
+    <ClCompile Include="CookieExampleApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
