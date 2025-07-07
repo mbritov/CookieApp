@@ -26,7 +26,7 @@ public:
     const std::string& GetDomain() const { return mDomain; }
     const std::string& GetPath() const { return mPath; }
     const std::string& GetExpires() const { return mExpires; }
-    const std::string& GetSameSite() const { return mSameSite.size() == 0 ? mSameSite : "(NULL)"; }
+    const std::string& GetSameSite() const { return mSameSite; }
 
     bool SetName(const std::string& name);
     bool SetValue(const std::string& value);
