@@ -8,7 +8,8 @@
 
 class CookieCpp {
 public:
-    static CookieCpp* Create(const std::string& name,
+    static CookieCpp* Create(
+        const std::string& name,
         const std::string& value,
         const std::string& domain,
         const std::string& path,
@@ -38,10 +39,12 @@ public:
     void SetSecure(bool secure) { mSecure = secure; }
     void SetHttpOnly(bool httpOnly) { mHttpOnly = httpOnly; }
     void SetSameSite(const std::string& sameSite) { mSameSite = sameSite; }
+    void SetPartitioned(bool partitioned) { mPartitioned = partitioned; }
 
     bool IsSecure() const { return mSecure; }
     bool IsHttpOnly() const { return mHttpOnly; }
     bool IsSessionCookie() const { return mExpires.empty(); }
+	bool IsPartitioned() const { return mPartitioned; }
 
     bool FromString(const std::string& cookieStr, const std::string& domain = "");
     const std::string& ToString() const;
@@ -56,6 +59,7 @@ private:
     std::string mSameSite;
     bool mSecure = false;
     bool mHttpOnly = false;
+    bool mPartitioned = false;
 
     bool Init(const std::string& name,
         const std::string& value,

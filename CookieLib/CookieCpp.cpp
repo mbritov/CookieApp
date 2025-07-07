@@ -12,7 +12,8 @@
 using namespace helpers;
 
 // CookieCpp class implementation
-CookieCpp* CookieCpp::Create(const std::string& name,
+CookieCpp* CookieCpp::Create(
+    const std::string& name,
     const std::string& value,
     const std::string& domain,
     const std::string& path,
@@ -68,94 +69,6 @@ bool CookieCpp::SetValue(const std::string& value) {
     return true;
 }
 
-// CookieCpp class implementation
-bool CookieCpp::FromString(const std::string& cookieStr, const std::string& domain) {
-    bool isNameSet = false;
-    bool isExpireSet = false;
-    auto parameters = SplitString(cookieStr, ';');
-
-    if (!domain.empty()) 
-        SetDomain(domain);
-
-    for (std::string param : parameters) {
-        std::string nameValue = TrimSpaces(param);
-        auto delimPos = nameValue.find('=');
-
-        std::string name = (delimPos != std::string::npos) ? nameValue.substr(0, delimPos) : nameValue;
-        std::string value = (delimPos != std::string::npos) ? nameValue.substr(delimPos + 1) : "";
-
-        if (name.empty()) continue;
-
-		// first we set mandatory Name and Value
-        if (!isNameSet) {
-            SetName(name);
-            SetValue(value);
-            isNameSet = true;
-            continue;
-        }
-
-		// second we check for optional parameters
-        if (StrCaseEq(name, "Domain")) {
-            SetDomain(value);
-        }
-        else if (StrCaseEq(name, "Expires")) {
-            if (!isExpireSet) SetExpires(value);
-        }
-        else if (StrCaseEq(name, "HttpOnly")) {
-            SetHttpOnly(true);
-        }
-        else if (StrCaseEq(name, "Max-Age")) {
-            // Indicates the number of seconds until the cookie expires. 
-            // A zero or negative number will expire the cookie immediately. 
-            // If both Expires and Max-Age are set, Max-Age has precedence.
-            int maxAge = std::stoi(value);
-
-            if (maxAge > 0) {
-                // Max-Age is # seconds from now. So expiration will be <Now> + Value                                                      
-                SetExpires(std::time(nullptr) + maxAge);
-				isExpireSet = true;
-            }
-            else {
-				// todo - expire cookie immediately
-            }
-        }
-        else if (StrCaseEq(name, "Path")) {
-            SetPath(value);
-        }
-        else if (StrCaseEq(name, "Secure")) {
-            SetSecure(true);
-        }
-        else if (StrCaseEq(name, "SameSite")) {
-            SetSameSite(value);
-			// If SameSite is set to "None", the Secure attribute must also be set.
-            if (StrCaseEq(value, "None"))
-                SetSecure(true);
-        }
-        else if (StrCaseEq(name, "Partitioned")) {
-			// todo - Partitioned cookies are not supported in this implementation
-            // Note that if this is set, the Secure attribute must also be set.
-        }
-    }
-
-    return isNameSet;
-}
-
-const std::string& CookieCpp::ToString() const {
-    if (mHeaderFormat.empty()) {
-        std::ostringstream oss;
-        oss << mName << "=" << mValue;
-
-        if (!mExpires.empty()) oss << "; expires=" << mExpires;
-        if (!mDomain.empty()) oss << "; domain=" << mDomain;
-        if (!mPath.empty()) oss << "; path=" << mPath;
-        if (mSecure) oss << "; secure";
-        if (mHttpOnly) oss << "; httponly";
-
-        mHeaderFormat = oss.str();
-    }
-    return mHeaderFormat;
-}
-
 void CookieCpp::SetDomain(const std::string& domain) {
     if (domain.find("#HttpOnly_") == 0) {
         mDomain = domain.substr(10);
@@ -188,4 +101,91 @@ void CookieCpp::SetExpires(time_t expires) {
 
 void CookieCpp::SetSecure(const std::string& secure) {
     mSecure = StrCaseEq(secure, "TRUE");
+}
+
+bool CookieCpp::FromString(const std::string& cookieStr, const std::string& domain) {
+    bool isNameSet = false;
+    bool isExpireSet = false;
+    auto parameters = SplitString(cookieStr, ';');
+
+    if (!domain.empty())
+        SetDomain(domain);
+
+    for (std::string param : parameters) {
+        std::string nameValue = TrimSpaces(param);
+        auto delimPos = nameValue.find('=');
+
+        std::string name = (delimPos != std::string::npos) ? nameValue.substr(0, delimPos) : nameValue;
+        std::string value = (delimPos != std::string::npos) ? nameValue.substr(delimPos + 1) : "";
+
+        if (name.empty()) continue;
+
+        // first we set mandatory Name and Value
+        if (!isNameSet) {
+            SetName(name);
+            SetValue(value);
+            isNameSet = true;
+            continue;
+        }
+
+        // second we check for optional parameters
+        if (StrCaseEq(name, "Domain")) {
+            SetDomain(value);
+        }
+        else if (StrCaseEq(name, "Expires")) {
+            if (!isExpireSet) SetExpires(value);
+        }
+        else if (StrCaseEq(name, "HttpOnly")) {
+            SetHttpOnly(true);
+        }
+        else if (StrCaseEq(name, "Max-Age")) {
+            // Indicates the number of seconds until the cookie expires. 
+            // A zero or negative number will expire the cookie immediately. 
+            // If both Expires and Max-Age are set, Max-Age has precedence.
+            int maxAge = std::stoi(value);
+
+            if (maxAge > 0) {
+                // Max-Age is # seconds from now. So expiration will be <Now> + Value                                                      
+                SetExpires(std::time(nullptr) + maxAge);
+                isExpireSet = true;
+            }
+            else {
+                // Set expiration to current time - it means cookie expires immediately
+                SetExpires(std::time(nullptr)); 
+            }
+        }
+        else if (StrCaseEq(name, "Path")) {
+            SetPath(value);
+        }
+        else if (StrCaseEq(name, "Secure")) {
+            SetSecure(true);
+        }
+        else if (StrCaseEq(name, "SameSite")) {
+            SetSameSite(value);
+            // If SameSite is set to "None", the Secure attribute must also be set.
+            if (StrCaseEq(value, "None"))
+                SetSecure(true);
+        }
+        else if (StrCaseEq(name, "Partitioned")) {
+			SetPartitioned(true);
+        }
+    }
+
+    return isNameSet;
+}
+
+const std::string& CookieCpp::ToString() const {
+    if (mHeaderFormat.empty()) {
+        std::ostringstream oss;
+        oss << mName << "=" << mValue;
+
+        if (!mExpires.empty()) oss << "; expires=" << mExpires;
+        if (!mDomain.empty()) oss << "; domain=" << mDomain;
+        if (!mPath.empty()) oss << "; path=" << mPath;
+        if (mSecure) oss << "; secure";
+        if (mHttpOnly) oss << "; httponly";
+
+        mHeaderFormat = oss.str();
+    }
+    return mHeaderFormat;
 }

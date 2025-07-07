@@ -2,6 +2,10 @@
 #include "../CookieLib/CookieCpp.h"
 #include "../CookieLib/CookieC.h"
 
+
+// Disclaimer: This file contain example tests to validate the functionality of the CookieCpp class.
+// The tests are not covering all the logic and may need to be adjusted.
+// The purpose is to demonstrate how to write tests using Google Test framework.
 namespace CookieCppTests  // Namespace for CookieCpp tests
 {
     TEST(CookieCppTests, ToString_CreatesValidHeader) {
